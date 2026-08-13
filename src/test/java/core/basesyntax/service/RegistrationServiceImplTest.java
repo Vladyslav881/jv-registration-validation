@@ -177,11 +177,69 @@ public class RegistrationServiceImplTest {
     }
 
     @Test
+    void register_negativeAge_notOk() {
+        User user = new User();
+        user.setLogin("user01");
+        user.setPassword("valid1");
+        user.setAge(-1);
+
+        assertThrows(
+                RegistrationException.class,
+                () -> registrationService.register(user)
+        );
+
+        assertEquals(0, Storage.people.size());
+    }
+
+    @Test
+    void register_emptyPassword_notOk() {
+        User user = new User();
+        user.setLogin("user01");
+        user.setPassword("");
+        user.setAge(21);
+
+        assertThrows(
+                RegistrationException.class,
+                () -> registrationService.register(user)
+        );
+
+        assertEquals(0, Storage.people.size());
+    }
+
+    @Test
+    void register_threeCharactersPassword_notOk() {
+        User user = new User();
+        user.setLogin("user01");
+        user.setPassword("abc");
+        user.setAge(21);
+
+        assertThrows(
+                RegistrationException.class,
+                () -> registrationService.register(user)
+        );
+
+        assertEquals(0, Storage.people.size());
+    }
+
+    @Test
     void register_eighteenYearsOld_ok() {
         User user = new User();
         user.setLogin("user01");
         user.setPassword("valid01");
         user.setAge(18);
+
+        User actual = registrationService.register(user);
+
+        assertEquals(user, actual);
+        assertEquals(1, Storage.people.size());
+    }
+
+    @Test
+    void register_eightCharactersPassword_ok() {
+        User user = new User();
+        user.setLogin("user01");
+        user.setPassword("password"); // 8 символів
+        user.setAge(21);
 
         User actual = registrationService.register(user);
 
